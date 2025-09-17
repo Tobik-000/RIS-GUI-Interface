@@ -13,8 +13,8 @@ results panel for transparent, reproducible handling of user data.
 
 import tkinter as tk
 from tkinter import ttk, messagebox
-from RIS_Voltage_Calculation.RIS_Voltage_map import ris_voltage_vector
-from connecting_to_pi import initialize_COM_port, send_to_pi, config_RIS
+from Utilities.RIS_Voltage_map import ris_voltage_vector
+from Utilities.connecting_to_pi import initialize_COM_port, send_to_pi, config_RIS
 import threading
 import time
 
@@ -50,7 +50,7 @@ class DualInputApp(tk.Tk):
         self.bind("<Escape>", lambda e: self.quit())
 
     def listen_for_responses(self):
-        from connecting_to_pi import ser
+        from Utilities.connecting_to_pi import ser
 
         self.listening = True
         while self.listening:
