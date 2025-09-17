@@ -4,7 +4,7 @@ Dual-Mode Input GUI (Angles or String)
 
 This program presents a simple graphical user interface with two input modes:
 (1) Angle mode: accepts two angular quantities—theta (θ) and phi (φ)—with domain
-    constraints θ ∈ [−90°, 90°] and φ ∈ [−180°, 180°].
+    constraints θ ∈ [-90°, 90°] and φ ∈ [-180°, 180°].
 (2) String mode: accepts an arbitrary UTF-8 text string.
 
 Submitted inputs are validated (angles) and then displayed in a read-only
@@ -248,7 +248,7 @@ class DualInputApp(tk.Tk):
         self._set_output_text("")
 
     def _write_output(self, header, payload: dict):
-        # Pretty-print to the Text widget, appending instead of replacing
+        # Print to the Text widget, appending the Text and dividing each entry
         divider = "-" * 60
         lines = [header]
         for k, v in payload.items():
