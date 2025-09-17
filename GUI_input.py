@@ -157,6 +157,22 @@ class DualInputApp(tk.Tk):
             self.string_tab, text=str(string_expl), wraplength=580, justify="left"
         ).pack(anchor="w")
 
+        # Preprogrammed strings
+        preprogrammed = [
+            "[7.8, 5.0, 0.0, 7.8, 5.0, 0.0, 7.8, 5.0, 0.0]",  # phi= 50, theta= 00
+            "[0.0, 5.0, 7.8, 0.0, 5.0, 7.8, 0.0, 5.0, 7.8]",  # phi=-50, theta= 00
+            "[7.9, 6.0, 4.7, 5.7, 4.6, 1.1, 4.3, 0.1, 8.0]",  # phi= 50, theta=-45
+            "[8.0, 0.1, 4.3, 1.1, 4.6, 5.7, 4.7, 6.0, 7.9]",  # phi= 50, theta= 45
+        ]
+        self.combobox = ttk.Combobox(
+            self.string_tab, values=preprogrammed, state="readonly", width=40
+        )
+        self.combobox.pack(anchor="w", pady=(0, 4))
+        self.combobox.bind(
+            "<<ComboboxSelected>>",
+            lambda e: self.string_var.set(self.combobox.get()),
+        )
+
         # ---- Submit + Clear controls (shared) ----
         ctrl = ttk.Frame(self, padding=(12, 0))
         ctrl.pack(fill="x", pady=(0, 4))
