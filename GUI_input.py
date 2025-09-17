@@ -1,16 +1,3 @@
-#!/usr/bin/env python3
-"""
-Dual-Mode Input GUI (Angles or String)
-
-This program presents a simple graphical user interface with two input modes:
-(1) Angle mode: accepts two angular quantities—theta (θ) and phi (φ)—with domain
-    constraints θ ∈ [-90°, 90°] and φ ∈ [-180°, 180°].
-(2) String mode: accepts an arbitrary UTF-8 text string.
-
-Submitted inputs are validated (angles) and then displayed in a read-only
-results panel for transparent, reproducible handling of user data.
-"""
-
 import tkinter as tk
 from tkinter import ttk, messagebox
 from Utilities.RIS_Voltage_map import ris_voltage_vector
@@ -88,9 +75,8 @@ class DualInputApp(tk.Tk):
         title_lbl.pack(anchor="w")
 
         expl = (
-            "Choose a mode below. In “Angles (θ, φ)” you may provide two angles with the "
-            "following admissible ranges: θ ∈ [−90°, 90°], φ ∈ [−180°, 180°].\n"
-            "Alternatively, switch to “String Input” to enter an arbitrary voltage vector."
+            "This interface allows you to control the RIS by specifying either steering angles (θ, φ) or directly entering a voltage vector.\n"
+            "The current Version supports only one 3x3 RIS."
         )
         expl_lbl = ttk.Label(header, text=expl, wraplength=600, justify="left")
         expl_lbl.pack(anchor="w", pady=(6, 0))
