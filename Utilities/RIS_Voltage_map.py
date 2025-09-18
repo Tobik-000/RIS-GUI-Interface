@@ -105,7 +105,7 @@ def steering_phases(theta_deg, phi_deg, dx=None, dy=None, max_phase=290.0):
 def ris_voltage_vector(
     theta_deg,
     phi_deg,
-    coeff_path="RIS_Voltage_Calculation\coefficients.npz",
+    coeff_path="Utilities/coefficients.npz",
     freq_idx=0,
     max_phase=290.0,
 ):
