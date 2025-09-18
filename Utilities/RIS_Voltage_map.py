@@ -150,7 +150,7 @@ def ris_voltage_vector(
     # Calculate phases and voltages
     phases, info = steering_phases(theta_deg, phi_deg, max_phase=max_phase)
     voltages = np.vectorize(lambda p: volt_map(p, coeffs[freq_idx]))(phases)
-    voltage_vector = voltages.round(1).flatten().tolist()[::-1]
+    voltage_vector = voltages.round(2).flatten().tolist()[::-1]
     return voltage_vector, phases, voltages, info
 
 

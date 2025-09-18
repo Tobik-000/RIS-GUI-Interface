@@ -29,7 +29,7 @@ class DualInputApp(tk.Tk):
 
         # Initialize COM port and configure RIS
         if initialize_COM_port():
-            config_RIS(0, "0-10V")
+            config_RIS(0, "0-20V")
             self._write_output("COM port initialized successfully.\n", {})
             self.start_listener()
         else:
@@ -108,9 +108,7 @@ class DualInputApp(tk.Tk):
         # phi
         ttk.Label(grid, text="φ (deg):").grid(row=1, column=0, sticky="w", pady=4)
         self.phi_var = tk.StringVar()
-        ttk.Label(grid, text="∈ [−90°, 90°]").grid(
-            row=1, column=2, sticky="w", pady=4
-        )
+        ttk.Label(grid, text="∈ [−90°, 90°]").grid(row=1, column=2, sticky="w", pady=4)
         self.phi_var = tk.StringVar()
         phi_entry = ttk.Entry(grid, textvariable=self.phi_var, width=12)
         phi_entry.grid(row=1, column=1, sticky="w", padx=(6, 18))
@@ -215,7 +213,7 @@ class DualInputApp(tk.Tk):
             self._write_output("Received valid angles.\n", payload)
 
             # Calculate corresponding voltage vector
-            voltage_vector = ris_voltage_vector(theta, phi)[0]
+            voltage_vector = ris_voltage_vector(theta, phi, max_phase=310)[0]
             self._write_output(
                 f"Calculated and sending voltage vector for (theta={theta}, phi={phi}):\n",
                 {"voltage_vector": f"{voltage_vector}"},
