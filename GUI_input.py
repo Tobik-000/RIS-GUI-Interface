@@ -116,7 +116,7 @@ class DualInputApp(tk.Tk):
         # Angle help text
         help_text = (
             "Scientific note: θ typically denotes elevation in [−90°, 90°], "
-            "while φ denotes azimuth in [−180°, 180°]. Values outside these "
+            "while φ denotes azimuth in [−180°, 180°]. \nValues outside these "
             "domains are considered invalid and will be rejected."
         )
         ttk.Label(self.angles_tab, text=help_text, wraplength=580, justify="left").pack(
@@ -128,17 +128,17 @@ class DualInputApp(tk.Tk):
         self.string_tab.pack_propagate(False)
         self.nb.add(self.string_tab, text="String Input")
 
-        ttk.Label(self.string_tab, text="Enter vector:").pack(anchor="w")
+        ttk.Label(
+            self.string_tab,
+            text="Enter vector, eg.: [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]",
+        ).pack(anchor="w")
         self.string_var = tk.StringVar()
         self.string_entry = ttk.Entry(
             self.string_tab, textvariable=self.string_var, width=60
         )
         self.string_entry.pack(anchor="w", pady=(4, 6), fill="x")
 
-        string_expl = (
-            "Enter a UTF-8 string representing a voltage vector of length 9, e.g., "
-            "[1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]"
-        )
+        string_expl = "Select preprogrammed vectors:"
         ttk.Label(
             self.string_tab, text=str(string_expl), wraplength=580, justify="left"
         ).pack(anchor="w")
