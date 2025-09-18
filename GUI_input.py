@@ -1,6 +1,9 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from Utilities.RIS_Voltage_map import ris_voltage_vector
+from Utilities.RIS_Voltage_map import (
+    ris_voltage_vector,
+    load_voltage_data_from_directory,
+)
 from Utilities.connecting_to_pi import initialize_COM_port, send_to_pi, config_RIS
 import threading
 import time
@@ -144,20 +147,34 @@ class DualInputApp(tk.Tk):
         ).pack(anchor="w")
 
         # Preprogrammed strings
-        preprogrammed = [
-            "[7.8, 5.0, 0.0, 7.8, 5.0, 0.0, 7.8, 5.0, 0.0]",  # phi= 50, theta= 00
-            "[0.0, 5.0, 7.8, 0.0, 5.0, 7.8, 0.0, 5.0, 7.8]",  # phi=-50, theta= 00
-            "[7.9, 6.0, 4.7, 5.7, 4.6, 1.1, 4.3, 0.1, 8.0]",  # phi= 50, theta=-45
-            "[8.0, 0.1, 4.3, 1.1, 4.6, 5.7, 4.7, 6.0, 7.9]",  # phi= 50, theta= 45
-        ]
+        # preprogrammed = [
+        #     "[7.8, 5.0, 0.0, 7.8, 5.0, 0.0, 7.8, 5.0, 0.0]",  # phi= 50, theta= 00
+        #     "[0.0, 5.0, 7.8, 0.0, 5.0, 7.8, 0.0, 5.0, 7.8]",  # phi=-50, theta= 00
+        #     "[7.9, 6.0, 4.7, 5.7, 4.6, 1.1, 4.3, 0.1, 8.0]",  # phi= 50, theta=-45
+        #     "[8.0, 0.1, 4.3, 1.1, 4.6, 5.7, 4.7, 6.0, 7.9]",  # phi= 50, theta= 45
+        # ]
+
+        stored_data = load_voltage_data_from_directory("voltage_vectors_Florian")
+        # Build label->vector mapping
+        label_to_vector = {}
+        labels = []
+        for s in stored_data:
+            az = s.get("target_azimuth", "?")
+            el = s.get("target_elevation", "?")
+            label = f"azi={az}, ele={el}"
+            labels.append(label)
+            label_to_vector[label] = s["voltage_vector"]
+
         self.combobox = ttk.Combobox(
-            self.string_tab, values=preprogrammed, state="readonly", width=40
+            self.string_tab, values=labels, state="readonly", width=40
         )
         self.combobox.pack(anchor="w", pady=(0, 4))
-        self.combobox.bind(
-            "<<ComboboxSelected>>",
-            lambda e: self.string_var.set(self.combobox.get()),
-        )
+
+        def on_select(event):
+            label = self.combobox.get()
+            self.string_var.set(label_to_vector[label])
+
+        self.combobox.bind("<<ComboboxSelected>>", on_select)
 
         # ---- Submit + Clear controls (shared) ----
         ctrl = ttk.Frame(self, padding=(12, 0))

@@ -1,3 +1,7 @@
+import numpy as np
+import os
+
+
 def _rotate_into_window(angles_deg, window_width=290.0, atol=1e-9):
     """
     Given angles in [0,360), find a global rotation c such that
@@ -96,11 +100,14 @@ def steering_phases(theta_deg, phi_deg, dx=None, dy=None, max_phase=290.0):
 
 
 # Function to compute voltage vector for given theta and phi
-import numpy as np
 
 
 def ris_voltage_vector(
-    theta_deg, phi_deg, coeff_path="RIS_Voltage_Calculation\coefficients.npz", freq_idx=0, max_phase=290.0
+    theta_deg,
+    phi_deg,
+    coeff_path="RIS_Voltage_Calculation\coefficients.npz",
+    freq_idx=0,
+    max_phase=290.0,
 ):
     """
     Compute the voltage vector for the RIS for given steering angles.
@@ -145,3 +152,26 @@ def ris_voltage_vector(
     voltages = np.vectorize(lambda p: volt_map(p, coeffs[freq_idx]))(phases)
     voltage_vector = voltages.round(1).flatten().tolist()[::-1]
     return voltage_vector, phases, voltages, info
+
+
+def load_voltage_data_from_directory(folder_path):
+    return_data = []
+    for file in os.listdir(folder_path):
+        if file.endswith(".npz"):
+            data = np.load(os.path.join(folder_path, file))
+            if (
+                "ris_settings" in data
+                and "target_azimuth" in data
+                and "target_elevation" in data
+            ):
+                return_data.append(
+                    {
+                        "voltage_vector": data["ris_settings"].round(2),
+                        "target_azimuth": data["target_azimuth"].item(),
+                        "target_elevation": data["target_elevation"].item(),
+                    }
+                )
+    return_data = sorted(
+        return_data, key=lambda x: (x["target_elevation"], x["target_azimuth"])
+    )
+    return return_data
