@@ -108,7 +108,7 @@ class DualInputApp(tk.Tk):
         # phi
         ttk.Label(grid, text="φ (deg):").grid(row=1, column=0, sticky="w", pady=4)
         self.phi_var = tk.StringVar()
-        ttk.Label(grid, text="∈ [−180°, 180°]").grid(
+        ttk.Label(grid, text="∈ [−90°, 90°]").grid(
             row=1, column=2, sticky="w", pady=4
         )
         self.phi_var = tk.StringVar()
@@ -119,7 +119,7 @@ class DualInputApp(tk.Tk):
         # Angle help text
         help_text = (
             "Scientific note: θ typically denotes elevation in [−90°, 90°], "
-            "while φ denotes azimuth in [−180°, 180°]. \nValues outside these "
+            "while φ denotes azimuth in [−90°, 90°]. \nValues outside these "
             "domains are considered invalid and will be rejected."
         )
         ttk.Label(self.angles_tab, text=help_text, wraplength=580, justify="left").pack(
@@ -202,8 +202,8 @@ class DualInputApp(tk.Tk):
             if not (-90.0 <= theta <= 90.0):
                 messagebox.showerror("Out of range", "θ must lie within [−90°, 90°].")
                 return
-            if not (-180.0 <= phi <= 180.0):
-                messagebox.showerror("Out of range", "φ must lie within [−180°, 180°].")
+            if not (-90.0 <= phi <= 90.0):
+                messagebox.showerror("Out of range", "φ must lie within [−90°, 90°].")
                 return
 
             # Construct a normalized result payload
