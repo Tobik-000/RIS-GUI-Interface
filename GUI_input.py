@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from Utilities.RIS_Voltage_map import (
     ris_voltage_vector,
-    load_voltage_data_from_directory,
+    load_data_from_directory,
 )
 from Utilities.connecting_to_pi import initialize_COM_port, send_to_pi, config_RIS
 import threading
@@ -154,17 +154,8 @@ class DualInputApp(tk.Tk):
         #     "[8.0, 0.1, 4.3, 1.1, 4.6, 5.7, 4.7, 6.0, 7.9]",  # phi= 50, theta= 45
         # ]
 
-        stored_data = load_voltage_data_from_directory("voltage_vectors_Florian")
-        # Build label->vector mapping
-        label_to_vector = {}
-        labels = []
-        for s in stored_data:
-            az = s.get("target_azimuth", "?")
-            el = s.get("target_elevation", "?")
-            label = f"azi={az}, ele={el}"
-            labels.append(label)
-            label_to_vector[label] = s["voltage_vector"]
-
+        labels, label_to_data = load_data_from_directory("voltage_vectors_Florian")
+        self.label_to_data = label_to_data  # Store for later use
         self.combobox = ttk.Combobox(
             self.string_tab, values=labels, state="readonly", width=40
         )
@@ -172,7 +163,10 @@ class DualInputApp(tk.Tk):
 
         def on_select(event):
             label = self.combobox.get()
-            self.string_var.set(label_to_vector[label])
+            data = self.label_to_data[label]
+            self.string_var.set(str(data["vector"]))
+            self.selected_azimuth = data["azimuth"]
+            self.selected_elevation = data["elevation"]
 
         self.combobox.bind("<<ComboboxSelected>>", on_select)
 
@@ -197,8 +191,7 @@ class DualInputApp(tk.Tk):
     # ---------------- Logic ----------------
     def _on_submit(self):
         active = self.nb.index(self.nb.select())
-
-        if active == 0:  # Angles tab
+        if active == 0:
             try:
                 theta = float(self.theta_var.get().strip())
                 phi = float(self.phi_var.get().strip())
@@ -237,7 +230,15 @@ class DualInputApp(tk.Tk):
                     "Empty input", "Please enter a non-empty string."
                 )
                 return
-
+            # Use stored angles if available, else None
+            theta = getattr(self, "selected_elevation", None)
+            phi = getattr(self, "selected_azimuth", None)
+            payload = {
+                "mode": "preprogrammed",
+                "theta_deg": theta,
+                "phi_deg": phi,
+            }
+            self._write_output("Received preprogrammed vector.\n", payload)
             self._write_output(
                 f"Sending Voltage vector:\n",
                 {"voltage_vector": text},

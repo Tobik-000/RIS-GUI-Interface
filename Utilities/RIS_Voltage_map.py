@@ -154,8 +154,9 @@ def ris_voltage_vector(
     return voltage_vector, phases, voltages, info
 
 
-def load_voltage_data_from_directory(folder_path):
-    return_data = []
+def load_data_from_directory(folder_path):
+    # Build a sorted list of (label, vector) pairs and a label->vector mapping
+    entries = []
     for file in os.listdir(folder_path):
         if file.endswith(".npz"):
             data = np.load(os.path.join(folder_path, file))
@@ -164,14 +165,16 @@ def load_voltage_data_from_directory(folder_path):
                 and "target_azimuth" in data
                 and "target_elevation" in data
             ):
-                return_data.append(
-                    {
-                        "voltage_vector": data["ris_settings"].round(2),
-                        "target_azimuth": data["target_azimuth"].item(),
-                        "target_elevation": data["target_elevation"].item(),
-                    }
-                )
-    return_data = sorted(
-        return_data, key=lambda x: (x["target_elevation"], x["target_azimuth"])
-    )
-    return return_data
+                az = data["target_azimuth"].item()
+                el = data["target_elevation"].item()
+                label = f"theta={el}, phi={az}"
+                vector = data["ris_settings"].round(2)
+                entries.append((el, az, label, vector))
+    # Sort by elevation, then azimuth
+    entries.sort()
+    labels = [label for _, _, label, _ in entries]
+    label_to_data = {
+        label: {"vector": vector.tolist(), "azimuth": az, "elevation": el}
+        for el, az, label, vector in entries
+    }
+    return labels, label_to_data
