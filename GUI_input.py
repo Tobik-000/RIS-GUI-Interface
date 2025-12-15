@@ -152,7 +152,7 @@ class DualInputApp(tk.Tk):
         #     "[8.0, 0.1, 4.3, 1.1, 4.6, 5.7, 4.7, 6.0, 7.9]",  # phi= 50, theta= 45
         # ]
 
-        labels, label_to_data = load_data_from_directory("voltage_vectors_Florian")
+        labels, label_to_data = load_data_from_directory("test_data")
         self.label_to_data = label_to_data  # Store for later use
         self.combobox = ttk.Combobox(
             self.string_tab, values=labels, state="readonly", width=40
