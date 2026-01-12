@@ -72,32 +72,44 @@ def steering_phases(theta_deg, phi_deg, dx=None, dy=None, max_phase=290.0):
     phi = np.deg2rad(phi_deg)
 
     # Progressive phase steps
-    dphi_x = -k * dx * np.sin(theta) * np.cos(phi)
-    dphi_y = -k * dy * np.sin(theta) * np.sin(phi)
+    dphi_x = -k * dx * np.cos(theta) * np.sin(phi)
+    dphi_z = -k * dy * np.sin(theta)
 
     # Build base phases in degrees, wrapped to [0,360)
     base = []
     idx_map = []  # (j,i) to put them back into 3x3
+    real_idx = []
     for i, m in enumerate([-1, 0, 1]):  # x-direction index (columns)
-        for j, n in enumerate([-1, 0, 1]):  # y-direction index (rows)
-            phase = m * dphi_x + n * dphi_y
+        for j, n in enumerate([-1, 0, 1]):  # z-direction index (rows)
+            phase = m * dphi_x + n * dphi_z
             phase_deg = np.rad2deg(phase) % 360.0
             base.append(phase_deg)
             idx_map.append((j, i))
+            real_idx.append((n, m))
 
     base = np.array(base)
 
     # Find rotation that fits all into [0, max_phase]
-    rotated, c_deg, span = _rotate_into_window(base, window_width=max_phase)
+    phase_values_in_window, c_deg, span = _rotate_into_window(base, window_width=max_phase)
 
     # Restore 3x3 array in the original (row=j, col=i) layout
+    phases_in_window = np.zeros((3, 3))
     phases = np.zeros((3, 3))
-    for val, (j, i) in zip(rotated, idx_map):
-        phases[j, i] = val
-
+    
+    for phase_value_in_window, (j, i), phase_value in zip(phase_values_in_window, idx_map, base):
+        phases_in_window[j, i] = phase_value_in_window
+        phases[j, i] = phase_value
+        
+    # Print phase mapping info
+    print("Phase mapping info:")
+    print(f"  Original phases (deg):\n{phases}")
+    print(f"  Mapped phases (deg):\n{phases_in_window}")
+    print(f"  Index map (row, col): {idx_map}")
+    print(f"  Real index (n, m): {real_idx}")
+    
+    
     info = {"rotation_deg": c_deg, "span_deg": span}
-    return phases, info
-
+    return phases_in_window, info
 
 # Function to compute voltage vector for given theta and phi
 
