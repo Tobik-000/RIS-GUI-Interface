@@ -40,11 +40,13 @@ voltages_from_phase = np.where(
     voltages_from_phase < max_voltage, voltages_from_phase, np.nan
 )
 
+fs = 18
 
 plt.figure(figsize=(12, 6))
 plt.plot(voltages_from_phase, phase_points, label="5 GHz")
-plt.xlabel("Voltage (V)")
-plt.ylabel("Phase (degrees)")
-plt.title("Tuning diagram at 5 GHz")
+plt.xlabel("Voltage [V]", fontsize=fs)
+plt.ylabel("Phase [°]", fontsize=fs)
+plt.title("Tuning diagram at 5 GHz", fontsize=fs, pad=10)
 plt.grid(True)
-plt.show()
+plt.tight_layout()
+plt.savefig("tuning_diagram_5GHz.png", dpi=300)

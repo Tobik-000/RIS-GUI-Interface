@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 from Utilities.RIS_Voltage_map import (
     ris_voltage_vector,
     load_data_from_directory,
+    angle_from_voltage_vector
 )
 from Utilities.connecting_to_pi import initialize_COM_port, send_to_pi, config_RIS
 import threading
@@ -145,12 +146,6 @@ class DualInputApp(tk.Tk):
         ).pack(anchor="w")
 
         # Preprogrammed strings
-        # preprogrammed = [
-        #     "[7.8, 5.0, 0.0, 7.8, 5.0, 0.0, 7.8, 5.0, 0.0]",  # phi= 50, theta= 00
-        #     "[0.0, 5.0, 7.8, 0.0, 5.0, 7.8, 0.0, 5.0, 7.8]",  # phi=-50, theta= 00
-        #     "[7.9, 6.0, 4.7, 5.7, 4.6, 1.1, 4.3, 0.1, 8.0]",  # phi= 50, theta=-45
-        #     "[8.0, 0.1, 4.3, 1.1, 4.6, 5.7, 4.7, 6.0, 7.9]",  # phi= 50, theta= 45
-        # ]
 
         labels, label_to_data = load_data_from_directory("test_data")
         self.label_to_data = label_to_data  # Store for later use
@@ -165,6 +160,8 @@ class DualInputApp(tk.Tk):
             self.string_var.set(str(data["vector"]))
             self.selected_azimuth = data["azimuth"]
             self.selected_elevation = data["elevation"]
+            
+            real_theta, real_phi = angle_from_voltage_vector(data["vector"])
 
         self.combobox.bind("<<ComboboxSelected>>", on_select)
 
