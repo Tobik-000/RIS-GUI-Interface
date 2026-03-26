@@ -235,7 +235,7 @@ class DualInputApp(tk.Tk):
             }
             self._write_output("Received preprogrammed vector.\n", payload)
             self._write_output(
-                f"Sending Voltage vector:\n",
+                "Sending Voltage vector:\n",
                 {"voltage_vector": text},
             )
             send_to_pi(text + "\n")
