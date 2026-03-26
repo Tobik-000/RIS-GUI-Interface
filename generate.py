@@ -10,12 +10,12 @@ import numpy as np
 
 
 # --- what you want to store ---
-ris_settings = np.array([5.72, 4.51, 0.45, 7.53, 5.78, 4.55, 0.1, 7.67, 5.84], dtype=float)
-target_azimuth = 34   # phi
-target_elevation = -30  # theta
+ris_settings = np.array([7.55, 0.6, 4.66, 2.62, 4.96, 6.67, 5.42, 7.24, 0.1], dtype=float)
+target_azimuth = -50     # phi
+target_elevation = 45  # theta
 
 # --- where to save ---
-out_dir = "test_data"          # change as needed
+out_dir = "new_matrix"          # change as needed
 os.makedirs(out_dir, exist_ok=True)
 
 # Use a filename that encodes theta/phi (optional but handy)

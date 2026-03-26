@@ -3,7 +3,7 @@ from tkinter import ttk, messagebox
 from Utilities.RIS_Voltage_map import (
     ris_voltage_vector,
     load_data_from_directory,
-    angle_from_voltage_vector
+    angle_from_voltage_vector,
 )
 from Utilities.connecting_to_pi import initialize_COM_port, send_to_pi, config_RIS
 import threading
@@ -147,7 +147,7 @@ class DualInputApp(tk.Tk):
 
         # Preprogrammed strings
 
-        labels, label_to_data = load_data_from_directory("test_data")
+        labels, label_to_data = load_data_from_directory("new_matrix")
         self.label_to_data = label_to_data  # Store for later use
         self.combobox = ttk.Combobox(
             self.string_tab, values=labels, state="readonly", width=40
@@ -160,7 +160,7 @@ class DualInputApp(tk.Tk):
             self.string_var.set(str(data["vector"]))
             self.selected_azimuth = data["azimuth"]
             self.selected_elevation = data["elevation"]
-            
+
             real_theta, real_phi = angle_from_voltage_vector(data["vector"])
 
         self.combobox.bind("<<ComboboxSelected>>", on_select)

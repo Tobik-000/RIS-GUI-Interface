@@ -73,7 +73,9 @@ def steering_phases(theta_deg, phi_deg, dy=None, dz=None, max_phase=290.0):
 
     # Progressive phase steps
     dphi_y = -k * dy * np.cos(theta) * np.sin(phi)
-    dphi_z = -k * dz * np.sin(theta)
+    dphi_z = (
+        k * dz * np.sin(theta)
+    )  # Note: sign flipped because first measuremeent resultet in theta being fliped
 
     # Build base phases in degrees, wrapped to [0,360)
     base = []
@@ -90,17 +92,21 @@ def steering_phases(theta_deg, phi_deg, dy=None, dz=None, max_phase=290.0):
     base = np.array(base)
 
     # Find rotation that fits all into [0, max_phase]
-    phase_values_in_window, c_deg, span = _rotate_into_window(base, window_width=max_phase)
+    phase_values_in_window, c_deg, span = _rotate_into_window(
+        base, window_width=max_phase
+    )
 
     # Restore 3x3 array in the original (row=j, col=i) layout
     phases_in_window = np.zeros((3, 3))
     phases = np.zeros((3, 3))
-    
-    for phase_value_in_window, (j, i), phase_value in zip(phase_values_in_window, idx_map, base):
+
+    for phase_value_in_window, (j, i), phase_value in zip(
+        phase_values_in_window, idx_map, base
+    ):
         phases_in_window[j, i] = phase_value_in_window
         phases[j, i] = phase_value
-        
-    print("-"*60)
+
+    print("-" * 60)
     print(f"Steering angles: theta={theta_deg}°, phi={phi_deg}°: ")
     # Print phase mapping info
     print("Phase mapping info:")
@@ -108,12 +114,13 @@ def steering_phases(theta_deg, phi_deg, dy=None, dz=None, max_phase=290.0):
     print(f"  Mapped phases (deg):\n{phases_in_window}")
     print(f"  Index map (row, col): {idx_map}")
     print(f"  Real index (n, m): {real_idx}")
-    
-    
+
     info = {"rotation_deg": c_deg, "span_deg": span}
     return phases_in_window, info
 
+
 import numpy as np
+
 
 def _invert_volt_map_lut(voltages, coeffs_1d, max_phase=290.0, lut_points=20001):
     """
@@ -158,7 +165,9 @@ def angle_from_voltage_vector(
     # 1) Voltages -> phases in [0, max_phase]
     coeff_data = np.load(coeff_path)
     coeffs = coeff_data["coefficients"]
-    phases_win = _invert_volt_map_lut(voltage_vector, coeffs[freq_idx], max_phase=max_phase, lut_points=lut_points)
+    phases_win = _invert_volt_map_lut(
+        voltage_vector, coeffs[freq_idx], max_phase=max_phase, lut_points=lut_points
+    )
     phases_win = phases_win.reshape((3, 3))
 
     # 2) Spatial unwrap (critical because your window-rotation can place the cut inside the array)
@@ -169,7 +178,7 @@ def angle_from_voltage_vector(
     # 3) Fit plane: phase(m,n) ≈ a*m + b*n + c, where a=dphi_y, b=dphi_z (radians)
     m = np.array([-1.0, 0.0, 1.0])  # columns
     n = np.array([-1.0, 0.0, 1.0])  # rows
-    M, N = np.meshgrid(m, n)        # M: col coordinate, N: row coordinate
+    M, N = np.meshgrid(m, n)  # M: col coordinate, N: row coordinate
 
     A = np.column_stack([M.ravel(), N.ravel(), np.ones(9)])
     y = pr.ravel()
@@ -183,8 +192,8 @@ def angle_from_voltage_vector(
     wavelength = 3e8 / frequency
     k = 2 * np.pi / wavelength
 
-    # theta from dphi_z = -k*dz*sin(theta)
-    s_theta = -dphi_z / (k * dz)
+    # theta from dphi_z = k*dz*sin(theta)
+    s_theta = dphi_z / (k * dz)
     s_theta = np.clip(s_theta, -1.0, 1.0)
     theta_rad = np.arcsin(s_theta)
 
@@ -199,7 +208,7 @@ def angle_from_voltage_vector(
         phi_rad = np.arcsin(s_phi)  # principal solution in [-pi/2, pi/2]
 
     theta_deg = np.rad2deg(theta_rad)  # already in [-90,90]
-    phi_deg = np.rad2deg(phi_rad)      # principal in [-90,90]
+    phi_deg = np.rad2deg(phi_rad)  # principal in [-90,90]
 
     # Optional: second azimuth solution due to sin ambiguity (phi and 180-phi have same sin)
     if return_phi_alternatives:
@@ -211,14 +220,10 @@ def angle_from_voltage_vector(
 
     # normalize to [-180,180)
     phi_deg = (phi_deg + 180.0) % 360.0 - 180.0
-    
-    
+
     print(f"Recovered angles: theta= {theta_deg:.2f}°, phi= {phi_deg:.2f}°")
-    
+
     return theta_deg, phi_deg
-
-
-
 
 
 # Function to compute voltage vector for given theta and phi
@@ -262,13 +267,12 @@ def ris_voltage_vector(
     coeff_data = np.load(coeff_path)
     coeffs = coeff_data["coefficients"]
 
-
-
     # Calculate phases and voltages
     phases, info = steering_phases(theta_deg, phi_deg, max_phase=max_phase)
     voltages = np.vectorize(lambda p: volt_map(p, coeffs[freq_idx]))(phases)
     voltage_vector = voltages.round(2).flatten().tolist()
     return voltage_vector, phases, voltages, info
+
 
 def volt_map(phase, coeffs):
     num = len(coeffs)
